@@ -1,0 +1,39 @@
+-- Replace your page item instead of P23_CAL_FILTER
+
+SELECT
+  m.meeting_id,
+  m.title_domain || ' - ' || m.title_name
+    || '||' || NVL(m.meeting_time,      'N/A')
+    || '||' || NVL(m.presenter_name,    'N/A')
+    || '||' || TO_CHAR(m.presenter_dept_no)
+    || '||' || NVL(m.audience,          '')
+    || '||' || m.title_domain
+    || '||' || CASE
+                 WHEN INSTR(':' || NVL(m.audience,'') || ':',
+                            ':' || :APP_USER || ':') > 0
+                 THEN 'Y' ELSE 'N'
+               END
+    || '||' || CASE
+                 WHEN TRUNC(m.meeting_date) < TRUNC(SYSDATE)
+                 THEN 'PAST' ELSE 'FUTURE'
+               END                                    AS event_title,
+  TRUNC(m.meeting_date)                               AS start_date,
+  TRUNC(m.meeting_date)                               AS end_date,
+  CASE m.presenter_dept_no
+    WHEN 10 THEN 'dept-10'
+    WHEN 20 THEN 'dept-20'
+    WHEN 30 THEN 'dept-30'
+    WHEN 40 THEN 'dept-40'
+    ELSE         'dept-default'
+  END                                                 AS css_class_col
+FROM internal_meetings m
+WHERE m.approved_sts = 'Y'
+AND   EXTRACT(YEAR FROM m.meeting_date) = EXTRACT(YEAR FROM SYSDATE)
+AND   (
+        :P23_CAL_FILTER IS NULL
+        OR :P23_CAL_FILTER = 'ALL'
+        OR ( :P23_CAL_FILTER = 'UPCOMING'
+             AND TRUNC(m.meeting_date) >= TRUNC(SYSDATE) )
+        OR ( :P23_CAL_FILTER = 'COMPLETED'
+             AND TRUNC(m.meeting_date) <  TRUNC(SYSDATE) )
+      )
