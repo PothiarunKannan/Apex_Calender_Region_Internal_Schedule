@@ -1,0 +1,99 @@
+Paste the following code on (Function and Global Variable Declaration)
+
+function handlePostAction() {
+    var randomNumber = Math.floor(Math.random() * 100) + 1;
+    apex.item("P23_MEETING_ID").setValue(randomNumber);
+}
+
+function open_region(){
+    $("#New_Session").dialog("open");
+}
+
+function saveMeeting() {
+
+  // Validation
+  if (!apex.item("P23_TITLE_NAME").getValue()) {
+    apex.message.showErrors([{
+      type:     "error",
+      location: "inline",
+      pageItem: "P23_TITLE_NAME",
+      message:  "Title Name is required.",
+      unsafe:   false
+    }]);
+    return;
+  }
+
+  if (!apex.item("P23_MEETING_DATE").getValue()) {
+    apex.message.showErrors([{
+      type:     "error",
+      location: "inline",
+      pageItem: "P23_MEETING_DATE",
+      message:  "Meeting Date is required.",
+      unsafe:   false
+    }]);
+    return;
+  }
+
+
+
+  apex.server.process("SAVE_MEETING", {
+    x01: apex.item("P23_MEETING_ID").getValue(),
+    x02: apex.item("P23_DOMAIN").getValue(),
+    x03: apex.item("P23_TITLE_NAME").getValue(),
+    x04: apex.item("P23_PRESENTER_NAME").getValue(),
+    x05: apex.item("P23_ID").getValue(),
+    x06: apex.item("P23_DEPTNO").getValue(),
+    x07: apex.item("P23_MEETING_DATE").getValue(),
+    x08: apex.item("P23_MEETING_TIME").getValue(),
+    x09: apex.item("P23_APPROVED_STATUS").getValue()
+  },
+  {
+    dataType: "json",
+    success: function(data) {
+
+      if (data.status === "SUCCESS") {
+
+        // Show success message
+        apex.message.showPageSuccess(data.message);
+
+        // Clear form items
+        apex.item("P23_MEETING_ID").setValue("");
+        apex.item("P23_DOMAIN").setValue("");
+        apex.item("P23_TITLE_NAME").setValue("");
+        apex.item("P23_PRESENTER_NAME").setValue("");
+        apex.item("P23_ID").setValue("");
+        apex.item("P23_DEPTNO").setValue("");
+        apex.item("P23_MEETING_DATE").setValue("");
+        apex.item("P23_MEETING_TIME").setValue("");
+        apex.item("P23_APPROVED_STATUS").setValue("");
+
+        // Close popup & refresh calendar
+        //apex.region("ADD_MEETING_POPUP").close();
+        apex.theme.closeRegion('New_Session'); 
+        apex.region("MEETING_CALENDAR").refresh();
+
+      } else {
+        // Show DB error message
+        apex.message.showErrors([{
+          type:     "error",
+          location: "page",
+          message:  data.message,
+          unsafe:   false
+        }]);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error("Status Code :", jqXHR.status);
+      console.error("Status Text :", textStatus);
+      console.error("Error Thrown:", errorThrown);
+      console.error("Response    :", jqXHR.responseText);
+      apex.message.showErrors([{
+        type:     "error",
+        location: "page",
+        message:  "Unexpected error: " + errorThrown + " — " + jqXHR.responseText,
+        unsafe:   false
+      }]);
+    }
+  });
+
+}
