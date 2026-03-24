@@ -1,0 +1,156 @@
+On Click of submit button - Dynamic Action with two true actions
+
+First True Action :- (PLSQL)
+DECLARE
+    Lv_count NUMBER;
+BEGIN
+    -- ✅ Clear error first
+    :P23_ERROR_MSG := NULL;
+
+    -- ✅ Check 1: Time slot already taken (highest priority)
+    SELECT COUNT(*) INTO Lv_count
+    FROM internal_meetings
+    WHERE MEETING_DATE = :P23_MEETING_DATE
+    AND   MEETING_TIME = :P23_MEETING_TIME;
+
+    IF Lv_count > 0 THEN
+        :P23_ERROR_MSG := 'Sorry, this time slot is already scheduled.';
+        RETURN; -- ✅ Exit immediately, no need to check further
+    END IF;
+
+    -- ✅ Check 2: Same dept already has session on this date
+    SELECT COUNT(*) INTO Lv_count
+    FROM internal_meetings
+    WHERE MEETING_DATE      = :P23_MEETING_DATE
+    AND   PRESENTER_DEPT_NO = :P23_DEPTNO;
+
+    IF Lv_count > 0 THEN -- ✅ Fixed: > 0 not > 1
+        :P23_ERROR_MSG := 'The selected date is already booked for another session in your team.';
+        RETURN; -- ✅ Exit immediately
+    END IF;
+
+    -- ✅ Check 3: Daily session limit reached
+    SELECT COUNT(*) INTO Lv_count
+    FROM internal_meetings
+    WHERE MEETING_DATE = :P23_MEETING_DATE;
+
+    IF Lv_count >= 3 THEN -- ✅ Fixed: >= 3 not > 3
+        :P23_ERROR_MSG := 'Only 3 internal sessions are allowed per day. Please choose another date.';
+        RETURN; -- ✅ Exit immediately
+    END IF;
+
+END;
+
+
+Second True ACtion (Javascript)
+
+var errorMsg = apex.item("P23_ERROR_MSG").getValue();
+
+if (errorMsg && errorMsg.trim() !== "") {
+    apex.message.showErrors([{
+        type:     "error",
+        location: "page",
+        message:  errorMsg,
+        unsafe:   false
+    }]);
+} else {
+    saveMeeting();
+}
+
+  Validation - 2 (P23_MEETING_TIME item input event )
+
+  var input = this.triggeringElement;
+
+// ✅ Force uppercase instantly before any processing
+var start = input.selectionStart;
+var end   = input.selectionEnd;
+input.value = input.value.toUpperCase();
+
+// ✅ Restore cursor position after uppercase conversion
+input.selectionStart = start;
+input.selectionEnd   = end;
+
+var val   = input.value;
+var key   = val.slice(-1);
+var len   = val.length;
+var valid = true;
+var msg   = "";
+
+switch(len) {
+  case 1:
+    if (!/^[0-9]$/.test(key)) { valid = false; msg = "Start with hour digit (1-12)"; }
+    break;
+  case 2:
+    if (/^0/.test(val)) {
+      if (!/^[1-9]$/.test(key)) { valid = false; msg = "Hour must be 01-09"; }
+    } else if (/^1/.test(val)) {
+      if (!/^[0-2:]$/.test(key)) { valid = false; msg = "Hour must be 10-12 or use ':'"; }
+    } else {
+      if (key !== ":") { valid = false; msg = "Expected ':' after hour"; }
+    }
+    break;
+  case 3:
+    if (key !== ":") { valid = false; msg = "Expected ':' here"; }
+    break;
+  case 4:
+    if (!/^[0-5]$/.test(key)) { valid = false; msg = "Minutes must be 00-59"; }
+    break;
+  case 5:
+    if (!/^[0-9]$/.test(key)) { valid = false; msg = "Minutes must be 00-59"; }
+    break;
+  case 6:
+    if (!/^[AP]$/.test(key)) { valid = false; msg = "Expected 'A' or 'P' for AM/PM"; }
+    break;
+  case 7:
+    if (key !== "M") { valid = false; msg = "Expected 'M' for AM/PM"; }
+    break;
+  case 8:
+    if (key !== "-") { valid = false; msg = "Expected '-' separator after AM/PM"; }
+    break;
+  case 9:
+    if (!/^[0-9]$/.test(key)) { valid = false; msg = "End hour digit must be 0-9"; }
+    break;
+  case 10:
+    if (/^.{8}0/.test(val)) {
+      if (!/^[1-9]$/.test(key)) { valid = false; msg = "End hour must be 01-09"; }
+    } else if (/^.{8}1/.test(val)) {
+      if (!/^[0-2:]$/.test(key)) { valid = false; msg = "End hour must be 10-12 or use ':'"; }
+    } else {
+      if (key !== ":") { valid = false; msg = "Expected ':' after end hour"; }
+    }
+    break;
+  case 11:
+    if (key !== ":") { valid = false; msg = "Expected ':' here"; }
+    break;
+  case 12:
+    if (!/^[0-5]$/.test(key)) { valid = false; msg = "End minutes must be 00-59"; }
+    break;
+  case 13:
+    if (!/^[0-9]$/.test(key)) { valid = false; msg = "End minutes must be 00-59"; }
+    break;
+  case 14:
+    if (!/^[AP]$/.test(key)) { valid = false; msg = "Expected 'A' or 'P' for AM/PM"; }
+    break;
+  case 15:
+    if (key !== "M") { valid = false; msg = "Expected 'M' to complete format"; }
+    break;
+  default:
+    if (len > 15) { valid = false; msg = "Maximum length reached. Format: 10:00AM-11:00AM"; }
+    break;
+}
+
+// ✅ If invalid — remove last character
+if (!valid) {
+  input.value = val.slice(0, -1);
+  apex.item("P23_MEETING_TIME").setValue(input.value, null, true);
+  apex.message.clearErrors();
+  apex.message.showErrors([{
+    type:     "error",
+    location: "inline",
+    pageItem: "P23_MEETING_TIME",
+    message:  msg,
+    unsafe:   false
+  }]);
+} else {
+  apex.message.clearErrors();
+}
