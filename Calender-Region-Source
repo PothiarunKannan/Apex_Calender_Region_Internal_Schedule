@@ -1,5 +1,5 @@
 -- Replace your page item instead of P23_CAL_FILTER
-
+Calender region - SQL Query (with the static ID of the region : MEETING_CALENDAR
 SELECT
   m.meeting_id,
   m.title_domain || ' - ' || m.title_name
@@ -37,3 +37,139 @@ AND   (
         OR ( :P23_CAL_FILTER = 'COMPLETED'
              AND TRUNC(m.meeting_date) <  TRUNC(SYSDATE) )
       )
+
+
+-- add following JS on attribute section (Initialization JavaScript Function)
+
+function(pOptions){
+  pOptions.initialView="dayGridMonth";
+  pOptions.firstDay=1;
+  pOptions.nowIndicator=true;
+  pOptions.dayMaxEvents=3;
+  pOptions.lazyFetching=false;
+
+  pOptions.customButtons={
+    upcomingBtn:{text:"Upcoming Sessions",click:function(){
+      apex.item("P23_CAL_FILTER").setValue("UPCOMING");
+      apex.region("MEETING_CALENDAR").refresh();
+      $(".fc-upcomingBtn-button").addClass("cal-active");
+      $(".fc-completedBtn-button,.fc-allBtn-button").removeClass("cal-active");
+    }},
+    completedBtn:{text:"Completed Sessions",click:function(){
+      apex.item("P23_CAL_FILTER").setValue("COMPLETED");
+      apex.region("MEETING_CALENDAR").refresh();
+      $(".fc-completedBtn-button").addClass("cal-active");
+      $(".fc-upcomingBtn-button,.fc-allBtn-button").removeClass("cal-active");
+    }},
+    allBtn:{text:"All Sessions",click:function(){
+      apex.item("P23_CAL_FILTER").setValue("ALL");
+      apex.region("MEETING_CALENDAR").refresh();
+      $(".fc-allBtn-button").addClass("cal-active");
+      $(".fc-upcomingBtn-button,.fc-completedBtn-button").removeClass("cal-active");
+    }},
+
+    addBtn:{text:"+ Add",click:function(){
+      $("#New_Session").dialog("open");
+      $("#clearbtn").click();
+    }}
+
+  };
+
+  pOptions.headerToolbar={
+    start:"upcomingBtn completedBtn allBtn",
+    center:"title",
+    end:"addBtn dayGridMonth,listMonth prev,next"   // ← addBtn added here
+  };
+
+  pOptions.buttonText={
+    month:"Month",
+    listMonth:"List"
+  };
+
+  function p(t){
+    var x=(t||"").split("||");
+    return{
+      title    :x[0]||"",
+      time     :x[1]||"",
+      presenter:x[2]||"",
+      dept     :x[3]||"",
+      audience :x[4]||"",
+      domain   :x[5]||"",
+      reg      :x[6]||"N",
+      period   :x[7]||"FUTURE"
+    };
+  }
+
+  pOptions.eventContent=function(info){
+    var d=p(info.event.title);
+    var star=d.reg==="Y"
+      ?'<span style="color:#fdd835;margin-right:3px;">&#9733;</span>'
+      :"";
+    var timeBadge=d.time&&d.time!=="N/A"
+      ?'<span style="font-size:10px;font-weight:700;color:#1565c0;'
+       +'background:#e8eaf6;padding:1px 5px;border-radius:3px;'
+       +'margin-right:5px;">'+d.time+'</span>'
+      :"";
+    return{
+      html:'<div class="fc-event-title">'
+          +star+timeBadge+d.title
+          +'</div>'
+    };
+  };
+
+  pOptions.eventClick=function(info){
+    var d=p(info.event.title);
+    var past=d.period==="PAST";
+    $("#pop-domain").text(d.domain);
+    $("#pop-title").text(d.title);
+    $("#pop-presenter").text(d.presenter);
+    $("#pop-dept").text("Dept "+d.dept);
+    $("#pop-date").text(info.event.startStr);
+    $("#pop-time").text(d.time);
+    var cnt=d.audience
+      ?d.audience.split(":").filter(Boolean).length
+      :0;
+    $("#pop-count").text(cnt+" attendee(s)");
+    var btn=$("#btn-register-toggle");
+    btn.data("meeting-id",info.event.id);
+    btn.data("is-past",past);
+    if(past){
+      btn.text("Session Completed")
+         .removeClass("not-registered registered")
+         .addClass("session-past")
+         .prop("disabled",true);
+      $("#reg-feedback")
+        .css("color","#888")
+        .text("Registration closed for past sessions.");
+    }else if(d.reg==="Y"){
+      btn.text("Registered - Click to Unregister")
+         .removeClass("not-registered session-past")
+         .addClass("registered")
+         .prop("disabled",false);
+      $("#reg-feedback").text("");
+    }else{
+      btn.text("Register for this Session")
+         .removeClass("registered session-past")
+         .addClass("not-registered")
+         .prop("disabled",false);
+      $("#reg-feedback").text("");
+    }
+    $("#MEETING_POPUP").dialog("open");
+  };
+
+  pOptions.eventDidMount=function(info){
+    var d=p(info.event.title);
+    $(info.el).attr(
+      "title",
+      d.title+" | "+d.time+" | "+d.presenter
+    );
+    if(d.period==="PAST"){
+      $(info.el).addClass("fc-event-past");
+    }
+    if(d.reg==="Y"){
+      $(info.el).addClass("fc-event-registered");
+    }
+  };
+
+  return pOptions;
+}
