@@ -1,0 +1,76 @@
+Create another AJAX call back process for add new sessions.
+
+In Function and Global Variable Declaration this process can be called on click of date and add button
+
+DECLARE
+  l_domain          VARCHAR2(200) := apex_application.g_x02;
+  l_title_name      VARCHAR2(200) := apex_application.g_x03;
+  l_presenter_name  VARCHAR2(200) := apex_application.g_x04;
+  l_presenter_id    VARCHAR2(100) := apex_application.g_x05;
+  l_dept_no         VARCHAR2(100) := apex_application.g_x06;
+  l_meeting_date    VARCHAR2(50)  := apex_application.g_x07;
+  l_meeting_time    VARCHAR2(50)  := apex_application.g_x08;
+  l_approved_sts    VARCHAR2(50)  := apex_application.g_x09;
+  l_date_converted  DATE;
+  l_rows_affected   NUMBER := 0;
+BEGIN
+
+  -- ✅ Validate required fields before INSERT
+  IF l_title_name IS NULL THEN
+    APEX_JSON.OPEN_OBJECT;
+    APEX_JSON.WRITE('status',  'ERROR');
+    APEX_JSON.WRITE('message', 'Title Name is required.');
+    APEX_JSON.CLOSE_OBJECT;
+    RETURN;
+  END IF;
+
+  IF l_meeting_date IS NULL THEN
+    APEX_JSON.OPEN_OBJECT;
+    APEX_JSON.WRITE('status',  'ERROR');
+    APEX_JSON.WRITE('message', 'Meeting Date is required.');
+    APEX_JSON.CLOSE_OBJECT;
+    RETURN;
+  END IF;
+
+  -- ✅ Date conversion (MM/DD/YYYY confirmed format)
+  l_date_converted := TO_DATE(l_meeting_date, 'MM/DD/YYYY');
+
+  -- ✅ INSERT
+  INSERT INTO internal_meetings (
+    TITLE_DOMAIN,
+    TITLE_NAME,
+    PRESENTER_NAME,
+    PRESENTER_ID,
+    PRESENTER_DEPT_NO,
+    MEETING_DATE,
+    MEETING_TIME,
+    APPROVED_STS
+  ) VALUES (
+    l_domain,
+    l_title_name,
+    l_presenter_name,
+    TO_NUMBER(NULLIF(l_presenter_id, '')),
+    l_dept_no,
+    l_date_converted,
+    l_meeting_time,
+    l_approved_sts
+  );
+
+  l_rows_affected := SQL%ROWCOUNT;
+  COMMIT;
+
+  -- ✅ Success response
+  APEX_JSON.OPEN_OBJECT;
+  APEX_JSON.WRITE('status',  'SUCCESS');
+  APEX_JSON.WRITE('message', l_title_name || ' scheduled');
+  APEX_JSON.WRITE('rows',    l_rows_affected);
+  APEX_JSON.CLOSE_OBJECT;
+
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    APEX_JSON.OPEN_OBJECT;
+    APEX_JSON.WRITE('status',  'ERROR');
+    APEX_JSON.WRITE('message', SQLERRM);
+    APEX_JSON.CLOSE_OBJECT;
+END;
