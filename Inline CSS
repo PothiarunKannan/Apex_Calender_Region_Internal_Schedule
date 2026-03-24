@@ -1,0 +1,476 @@
+Paste Below CSS in page level
+
+
+/* ================================================
+   HEADER TOOLBAR
+   ================================================ */
+ .fc-header-toolbar {
+  /* background:    #1a237e; */
+  /* padding:       12px 16px; */
+  border-radius: 10px;
+  /* margin-bottom: 16px !important; */
+} 
+
+.fc-toolbar-title {
+  font-size:      20px    !important;
+  font-weight:    700     !important;
+  color:          #0a0909 !important;
+  letter-spacing: 0.5px;
+}
+
+/* ================================================
+   ALL TOOLBAR BUTTONS BASE
+   ================================================ */
+.fc-button,
+.fc-buttoprimaryn- {
+  border-radius:  6px      !important;
+  font-size:      12px     !important;
+  font-weight:    600      !important;
+  padding:        6px 14px !important;
+  border:         none     !important;
+  transition:     all 0.25s ease !important;
+  letter-spacing: 0.3px;
+  box-shadow:     0 2px 6px rgba(0,0,0,0.2) !important;
+  transform:      none !important;
+}
+
+.fc-button-primary {
+  background-color: #C0C0C0 !important;
+  color:            #000000    !important;
+}  
+
+.fc-button-primary:hover {
+  background-color: #808080  !important;
+  transform:        translateY(-1px) !important;
+  box-shadow:       0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+.fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #808080 !important;
+  box-shadow:       none    !important;
+  color:            #000000    !important;
+}
+
+/* ================================================
+   UPCOMING SESSIONS BUTTON
+   ================================================ */
+.fc-upcomingBtn-button {
+  background: linear-gradient(135deg,#1e88e5,#1565c0) !important;
+  color:      #fff !important;
+}
+
+.fc-upcomingBtn-button::before {
+  content:   "[ ] ";
+  font-size: 11px;
+}
+
+.fc-upcomingBtn-button:hover {
+  background: linear-gradient(135deg,#1565c0,#0d47a1) !important;
+  transform:  translateY(-2px) !important;
+}
+
+.fc-upcomingBtn-button.cal-active {
+  background:  #ffffff !important;
+  color:       #1565c0 !important;
+  font-weight: 800     !important;
+  box-shadow:  0 0 0 3px rgba(255,255,255,0.5) inset,
+               0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* ================================================
+   COMPLETED SESSIONS BUTTON
+   ================================================ */
+.fc-completedBtn-button {
+  background: linear-gradient(135deg,#43a047,#2e7d32) !important;
+  color:      #fff !important;
+}
+
+.fc-completedBtn-button::before {
+  content:   "✔ ";
+  font-size: 11px;
+}
+
+.fc-completedBtn-button:hover {
+  background: linear-gradient(135deg,#2e7d32,#1b5e20) !important;
+  transform:  translateY(-2px) !important;
+}
+
+.fc-completedBtn-button.cal-active {
+  background:  #ffffff !important;
+  color:       #2e7d32 !important;
+  font-weight: 800     !important;
+  box-shadow:  0 0 0 3px rgba(255,255,255,0.5) inset,
+               0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* ================================================
+   ALL SESSIONS BUTTON
+   ================================================ */
+.fc-allBtn-button {
+  background: linear-gradient(135deg,#fb8c00,#e65100) !important;
+  color:      #fff !important;
+}
+
+.fc-allBtn-button::before {
+  content:     "≡ ";
+  font-size:   14px;
+  font-weight: 700;
+}
+
+.fc-allBtn-button:hover {
+  background: linear-gradient(135deg,#e65100,#bf360c) !important;
+  transform:  translateY(-2px) !important;
+}
+
+.fc-allBtn-button.cal-active {
+  background:  #ffffff !important;
+  color:       #e65100 !important;
+  font-weight: 800     !important;
+  box-shadow:  0 0 0 3px rgba(255,255,255,0.5) inset,
+               0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* ================================================
+   REFRESH BUTTON
+   ================================================
+.fc-refreshBtn-button {
+  background: linear-gradient(135deg,#546e7a,#37474f) !important;
+  color:      #fff     !important;
+  min-width:  40px     !important;
+  font-size:  16px     !important;
+  padding:    6px 12px !important;
+  transform:  none     !important;
+}
+
+.fc-refreshBtn-button:hover {
+  background: linear-gradient(135deg,#37474f,#263238) !important;
+  transform:  none !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+}
+
+.fc-refreshBtn-button:active {
+  transform: scale(0.92) !important;
+}  */
+
+/* ================================================
+   BUTTON ANIMATION
+   ================================================ */
+@keyframes btnRipple {
+  0%   { transform: scale(1);    }
+  50%  { transform: scale(0.95); }
+  100% { transform: scale(1);    }
+}
+
+.fc-button:active {
+  animation: btnRipple 0.2s ease !important;
+}
+
+/* ================================================
+   CALENDAR GRID HEADERS
+   ================================================ */
+.fc-col-header-cell {
+  background:     #e8eaf6;
+  font-weight:    700;
+  font-size:      12px;
+  color:          #1a237e;
+  padding:        8px 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* ================================================
+   TODAY CELL
+   ================================================ */
+.fc-day-today {
+  background-color: #e3f2fd !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  background:      #1e88e5;
+  color:           #fff !important;
+  border-radius:   50%;
+  width:           28px;
+  height:          28px;
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  font-weight:     700;
+  font-size:       13px;
+}
+
+/* ================================================
+   WEEKEND
+   ================================================ */
+.fc-day-sat { background-color: #fafafa !important; }
+.fc-day-sun { background-color: #fff8f8 !important; }
+
+/* ================================================
+   EVENTS — MONTH VIEW
+   ================================================ */
+.fc-daygrid-event {
+  border-radius: 5px     !important;
+  font-size:     11px    !important;
+  padding:       3px 6px !important;
+  cursor:        pointer !important;
+  border:        none    !important;
+  transition:    transform 0.15s ease,
+                 box-shadow 0.15s ease !important;
+}
+
+.fc-daygrid-event:hover {
+  transform:  translateY(-2px) !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25) !important;
+  z-index:    999 !important;
+}
+
+.fc-event-registered {
+  box-shadow: 0 0 0 2px #fdd835 inset !important;
+}
+
+.fc-event-past {
+  opacity: 0.55 !important;
+  filter:  grayscale(25%) !important;
+}
+
+/* ================================================
+   DEPARTMENT COLORS
+   ================================================ */
+.dept-10 {
+  background-color: #1e88e5 !important;
+  border-color:     #0d47a1 !important;
+  color:            #fff    !important;
+}
+
+.dept-20 {
+  background-color: #43a047 !important;
+  border-color:     #1b5e20 !important;
+  color:            #fff    !important;
+}
+
+.dept-30 {
+  background-color: #8e24aa !important;
+  border-color:     #4a148c !important;
+  color:            #fff    !important;
+}
+
+.dept-40 {
+  background-color: #fb8c00 !important;
+  border-color:     #e65100 !important;
+  color:            #fff    !important;
+}
+
+.dept-default {
+  background-color: #546e7a !important;
+  border-color:     #263238 !important;
+  color:            #fff    !important;
+}
+
+/* ================================================
+   LIST VIEW
+   ================================================ */
+.fc-list {
+  border-radius: 8px;
+  overflow:      hidden;
+  border:        1px solid #e0e0e0 !important;
+}
+
+.fc-list-day-cushion {
+  background:     #1a237e !important; 
+  color:          #fff    !important;
+  font-size:      12px;
+  font-weight:    700;
+  padding:        8px 14px !important;
+  letter-spacing: 0.5px;
+}
+
+.fc-list-day-text,
+.fc-list-day-side-text {
+  color: #fff !important;
+}
+
+.fc-list-event {
+  cursor:     pointer   !important;
+  transition: background 0.15s ease !important;
+}
+
+.fc-list-event:hover td {
+  background: #e8eaf6 !important;
+}
+
+/* Hide all-day text */
+.fc-list-event-time {
+  display: none !important;
+}
+
+.fc-list-event-title {
+  font-size:   13px;
+  font-weight: 600;
+  color:       #212121;
+  padding:     10px 14px !important;
+}
+
+.fc-list-event-dot {
+  border-width: 7px !important;
+}
+
+.fc-list-empty {
+  background: #f5f7fa !important;
+  padding:    40px    !important;
+  text-align: center;
+}
+
+.fc-list-empty-cushion {
+  color:       #9e9e9e !important;
+  font-size:   14px;
+  font-weight: 600;
+}
+
+/* ================================================
+   POPUP DIALOG
+   ================================================ */
+.meeting-popup-body {
+  padding: 6px 2px;
+}
+
+.meeting-popup-domain {
+  font-size:      11px;
+  font-weight:    700;
+  color:          #1565c0;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom:  6px;
+}
+
+.meeting-popup-title {
+  font-size:     17px;
+  font-weight:   700;
+  color:         #1a237e;
+  margin-bottom: 16px;
+  line-height:   1.4;
+  border-left:   4px solid #1e88e5;
+  padding-left:  10px;
+}
+
+.meeting-popup-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   10px;
+  margin-bottom:         18px;
+}
+
+.meeting-popup-item {
+  background:    #f5f7fa;
+  border-radius: 8px;
+  padding:       10px 12px;
+  border-left:   3px solid #e0e0e0;
+}
+
+.pop-label {
+  display:        block;
+  font-size:      10px;
+  color:          #999;
+  margin-bottom:  4px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.pop-value {
+  font-size:   13px;
+  font-weight: 600;
+  color:       #212121;
+}
+
+/* ================================================
+   REGISTER BUTTON
+   ================================================ */
+.meeting-register-wrap {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.meeting-reg-btn {
+  padding:        10px 28px;
+  font-size:      14px;
+  font-weight:    700;
+  border:         none;
+  border-radius:  25px;
+  cursor:         pointer;
+  transition:     all 0.25s ease;
+  letter-spacing: 0.4px;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0    rgba(67,160,71,0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(67,160,71,0);   }
+  100% { box-shadow: 0 0 0 0    rgba(67,160,71,0);   }
+}
+
+.meeting-reg-btn.not-registered {
+  background: linear-gradient(135deg,#43a047,#2e7d32);
+  color:      #fff;
+  animation:  pulse 2s infinite;
+}
+
+.meeting-reg-btn.not-registered:hover {
+  background: linear-gradient(135deg,#2e7d32,#1b5e20);
+  transform:  scale(1.05);
+}
+
+.meeting-reg-btn.registered {
+  background: linear-gradient(135deg,#e53935,#b71c1c);
+  color:      #fff;
+}
+
+.meeting-reg-btn.registered:hover {
+  background: linear-gradient(135deg,#b71c1c,#7f0000);
+  transform:  scale(1.05);
+}
+
+.meeting-reg-btn.session-past {
+  background: #bdbdbd     !important;
+  color:      #fff        !important;
+  cursor:     not-allowed !important;
+  opacity:    0.8;
+  animation:  none        !important;
+}
+
+.reg-feedback {
+  display:     block;
+  margin-top:  10px;
+  font-size:   12px;
+  font-weight: 600;
+  min-height:  18px;
+  transition:  all 0.3s ease;
+}
+
+/* ================================================
+   DEPARTMENT LEGEND
+   ================================================ */
+.dept-legend {
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           12px;
+  margin-bottom: 14px;
+  padding:       10px 14px;
+  background:    #f5f7fa;
+  border-radius: 8px;
+  border:        1px solid #e0e0e0;
+  box-shadow:    0 1px 4px rgba(0,0,0,0.06);
+}
+
+.dept-legend-item {
+  display:     flex;
+  align-items: center;
+  font-size:   12px;
+  color:       #333;
+  font-weight: 600;
+  gap:         7px;
+}
+
+.dept-legend-dot {
+  width:         14px;
+  height:        14px;
+  border-radius: 4px;
+  display:       inline-block;
+  box-shadow:    0 1px 3px rgba(0,0,0,0.2);
+}
