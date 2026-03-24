@@ -54,3 +54,5 @@ P23_MEETING_DATE			- Meeting Date
 P23_MEETING_TIME			- Meeting time 
 P23_APPROVED_STATUS		- approved status				        - Swith 
 P23_ERR_MSG					  - hidden
+SUBMIT                - BUTTON
+CLEAR                 - BUTTON
