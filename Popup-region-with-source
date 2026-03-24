@@ -1,0 +1,56 @@
+create inline popup static region with the static ID of MEETING_POPUP
+
+this region will be called when click of the event for registeration
+
+
+<div class="meeting-popup-body">
+
+  <div class="meeting-popup-domain" id="pop-domain"></div>
+  <div class="meeting-popup-title"  id="pop-title"></div>
+
+  <div class="meeting-popup-grid">
+    <div class="meeting-popup-item">
+      <span class="pop-label">👤 Presenter</span>
+      <span class="pop-value" id="pop-presenter"></span>
+    </div>
+    <div class="meeting-popup-item">
+      <span class="pop-label">🏢 Department</span>
+      <span class="pop-value" id="pop-dept"></span>
+    </div>
+    <div class="meeting-popup-item">
+      <span class="pop-label">📅 Date</span>
+      <span class="pop-value" id="pop-date"></span>
+    </div>
+    <div class="meeting-popup-item">
+      <span class="pop-label">🕐 Time</span>
+      <span class="pop-value" id="pop-time"></span>
+    </div>
+    <div class="meeting-popup-item">
+      <span class="pop-label">👥 Registered</span>
+      <span class="pop-value" id="pop-count"></span>
+    </div>
+  </div>
+
+  <div class="meeting-register-wrap">
+    <button id="btn-register-toggle" class="meeting-reg-btn">
+      Loading...
+    </button>
+    <span id="reg-feedback" class="reg-feedback"></span>
+  </div>
+
+</div>
+
+
+
+// create another inline popup region with following page items
+
+P23_MEETING_ID        - Meeting Id
+P23_DOMAIN					  - Domain
+P23_TITLE_NAME				- Title Of the Session
+P23_PRESENTER_NAME		- Presenter Name				        - popup-lov - additional attr (EMPNO:P23_ID)
+P23_ID						    - Presenter ID
+P23_DEPTNO					  - Presenter Dept				        - select lsit 
+P23_MEETING_DATE			- Meeting Date
+P23_MEETING_TIME			- Meeting time 
+P23_APPROVED_STATUS		- approved status				        - Swith 
+P23_ERR_MSG					  - hidden
