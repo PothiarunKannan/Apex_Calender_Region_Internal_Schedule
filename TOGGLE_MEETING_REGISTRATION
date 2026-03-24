@@ -1,0 +1,119 @@
+Create Dynamic action with following details
+Event              : Click
+selection type     : Jquery selector
+Jquery selector    : #btn-register-toggle // mention this ID in calender region attribute (initialize js code)
+
+Execute Javascript code:-
+//start
+  var btn       = $("#btn-register-toggle");
+var meetingId = btn.data("meeting-id");
+var isPast    = btn.data("is-past");
+var feedback  = $("#reg-feedback");
+
+// Block if past session
+if (isPast) {
+  feedback.css("color", "#888")
+          .text("Registration is closed for completed sessions.");
+  return;
+}
+
+btn.prop("disabled", true).text("Processing...");
+
+apex.server.process("TOGGLE_MEETING_REGISTRATION", {
+  x01: meetingId
+}, {
+  dataType: "text",
+  success: function (data) {
+    var result;
+    try {
+      result = JSON.parse(data);
+    } catch (e) {
+      btn.prop("disabled", false);
+      feedback.css("color", "#e53935").text("Response error. Try again.");
+      return;
+    }
+
+    btn.prop("disabled", false);
+
+    if (result.action === "ADD") {
+      btn.text("Registered - Click to Unregister")
+         .removeClass("not-registered")
+         .addClass("registered");
+      btn.data("is-registered", true);
+      feedback.css("color", "#43a047")
+              .text("You have registered successfully!");
+
+    } else if (result.action === "REMOVE") {
+      btn.text("Register for this Session")
+         .removeClass("registered")
+         .addClass("not-registered");
+      btn.data("is-registered", false);
+      feedback.css("color", "#e53935")
+              .text("You have unregistered from this session.");
+
+    } else {
+      feedback.css("color", "#e53935")
+              .text("Error: " + (result.message || "Unknown error"));
+    }
+
+    // Refresh calendar silently
+    apex.region("MEETING_CALENDAR").refresh();
+  },
+  error: function (xhr) {
+    btn.prop("disabled", false);
+    feedback.css("color", "#e53935")
+            .text("Connection error. Please try again.");
+    console.error("AJAX Error:", xhr.responseText);
+  }
+});
+//end
+
+
+-- Create AJAX call back process procession Tab with name of TOGGLE_MEETING_REGISTRATION
+DECLARE
+  l_meeting_id  NUMBER        := TO_NUMBER(apex_application.g_x01);
+  l_user_id     VARCHAR2(100) := :APP_USER;
+  l_audience    VARCHAR2(4000);
+  l_action      VARCHAR2(10);
+BEGIN
+  -- Get current audience value
+  SELECT NVL(audience, '')
+  INTO   l_audience
+  FROM   internal_meetings
+  WHERE  meeting_id = l_meeting_id;
+
+  -- Check if already registered
+  IF INSTR(':' || l_audience || ':', ':' || l_user_id || ':') > 0 THEN
+
+    -- UNREGISTER — remove user from string
+    l_audience := REPLACE(':' || l_audience || ':', ':' || l_user_id || ':', ':');
+    l_audience := TRIM(':' FROM l_audience);
+    l_action   := 'REMOVE';
+
+  ELSE
+
+    -- REGISTER — add user to string
+    IF l_audience IS NULL OR l_audience = '' THEN
+      l_audience := l_user_id;
+    ELSE
+      l_audience := l_audience || ':' || l_user_id;
+    END IF;
+    l_action := 'ADD';
+
+  END IF;
+
+  -- Save back to table
+  UPDATE internal_meetings
+  SET    audience   = l_audience
+  WHERE  meeting_id = l_meeting_id;
+
+  COMMIT;
+
+  -- Return JSON result
+  HTP.P('{"action":"' || l_action || '","audience":"' || l_audience || '"}');
+
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    HTP.P('{"action":"ERROR","message":"' || REPLACE(SQLERRM,'"','''') || '"}');
+END;
